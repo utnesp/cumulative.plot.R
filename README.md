@@ -7,7 +7,7 @@ Generate cumulative plot using ggplot (and ggplotly)
 devtools::install_github("utnesp/Easy-bioMart")
 devtools::install_github("utnesp/cumulative.plot.R")
 library(cum.plot)
-```R
+```
 
 
 ## USAGE
