@@ -1,5 +1,5 @@
 #' @title Cumulative frequency plot
-#' @param
+#' @author Peter Utnes \email{utnesp@gmail.com}
 #' @param file.or.object Provide a .txt file or object where row.names are ensembl_gene_identifiers
 #' @param legend.position Position of legend within plot. Defaults to c(0.8, 0.7) 
 #' @param incl.mito.genes Include mitochondrial genes in plot. Defaults to FALSE.

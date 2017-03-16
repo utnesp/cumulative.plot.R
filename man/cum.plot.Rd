@@ -28,3 +28,6 @@ cum.plot(file.or.object, legend.position = c(0.8, 0.7), incl.mito.genes = F,
 \examples{
 See https://github.com/utnesp/cumulative.plot.R
 }
+\author{
+Peter Utnes \email{utnesp@gmail.com}
+}
