@@ -144,12 +144,10 @@ cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.ge
                           values = as.character(s$color))
     p2 <- p2 + coord_polar(theta = "y") + theme_classic() + labs(x="", y = "") + theme(axis.ticks = element_blank(), axis.line = element_blank(), axis.text = element_blank()) 
     
-    pdf(file = file.pdf)
     print(p1)
-    #ggsave(file.pdf, device = "pdf", dpi = 300)
+    ggsave(file.pdf, device = "pdf", dpi = 300)
     print(p2)
-    dev.off()
-    
+    ggsave(paste(gsub(".pdf", "", file.pdf), "_proportions.pdf", sep = ""), device = "pdf", dpi = 300)
     openPDF(file.pdf)
     system(paste("open", dirname(file.pdf)))
     
