@@ -16,6 +16,7 @@
 #' @import ggthemes
 #' @import plotly
 #' @import htmlwidgets
+#' @import data.table
 #' @examples See https://github.com/utnesp/cumulative.plot.R
 
 cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.genes = F, cum.freq.out.file.txt = "", file.pdf = "", file.html = "", color.numbers.to.use = "", biotype.cutoff = "") {
