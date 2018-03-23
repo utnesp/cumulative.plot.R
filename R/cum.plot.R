@@ -137,18 +137,17 @@ cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.ge
     
         if(legend.position != "") p1 <- p1 + theme(legend.text=element_text(size=10), legend.position = legend.position)
         if(legend.position == "") p1 <- p1 + theme(legend.text=element_text(size=10), legend.justification = c(1,1), legend.position = c(1,1)) 
-
-    pdf(file = file.pdf, colormodel = "cmyk")
-    plot.new()
-    p1
-    #ggsave(file.pdf, device = "pdf", dpi = 300)
     
     p2 <- ggplot(e.sub, aes(x = factor(1), fill = factor(gene_biotype))) + geom_bar(width = 1, show.legend = FALSE) + 
         scale_fill_manual(name = "Biotype",
                           labels = s$gene_biotype,
                           values = as.character(s$color))
     p2 <- p2 + coord_polar(theta = "y") + theme_classic() + labs(x="", y = "") + theme(axis.ticks = element_blank(), axis.line = element_blank(), axis.text = element_blank()) 
-    p2
+    
+    pdf(file = file.pdf)
+    print(p1)
+    #ggsave(file.pdf, device = "pdf", dpi = 300)
+    print(p2)
     dev.off()
     
     openPDF(file.pdf)
