@@ -10,6 +10,7 @@
 #' @param biotype.cutoff How many biotypes to represent in the plot. Defaults to 10.
 #' @export
 #' @import biomaRt
+#' @import dplyr
 #' @import RColorBrewer
 #' @import easybiomart
 #' @import ggplot2
@@ -89,8 +90,16 @@ cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.ge
     t <- merge(x, t, by = "ensembl_gene_id")
     t <- with(t, t[order(gene_biotype, freq), ])
     f <- setDT(t)
-    e <- data.table::f[, .(CumulativeFrequency) := .(cumsum(freq)), by=.(gene_biotype)]
-    e <- data.frame(e)
+    
+    # Does not work inside function, using dplyr insted
+    # e <- data.table:::f[, .(CumulativeFrequency) := .(cumsum(freq)), by=.(gene_biotype)]
+    # e <- data.frame(e)
+    
+    e <- as.data.frame(f %>% 
+        group_by(gene_biotype) %>% 
+        mutate(CumulativeFrequency=cumsum(freq)))
+    
+    
     e$gene_biotype <- paste(e$gene_biotype, " (", e$bio_tot, ")", sep = "")
     
     
