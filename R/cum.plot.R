@@ -88,8 +88,7 @@ cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.ge
     t <- merge(x, t, by = "ensembl_gene_id")
     t <- with(t, t[order(gene_biotype, freq), ])
     f <- setDT(t)
-    if(!grepl("data.table", class(f)[1])) f <- as.data.table(t)
-    e <- f[, CumulativeFrequency := cumsum(freq), by=list(gene_biotype)]
+    e <- f[, CumulativeFrequency := cumsum(freq), by=gene_biotype]
     e <- data.frame(e)
     e$gene_biotype <- paste(e$gene_biotype, " (", e$bio_tot, ")", sep = "")
     
