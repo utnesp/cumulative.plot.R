@@ -133,9 +133,11 @@ cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.ge
         scale_shape_manual(name = "Biotype",
                            labels = s$gene_biotype,
                            values = s$shape) + 
-        if(legend.position != "") theme(legend.text=element_text(size=10), legend.position = legend.position) + 
-        if(legend.position == "") theme(legend.text=element_text(size=10), legend.justification = c(1,1), legend.position = c(1,1)) + 
         guides(shape=guide_legend(override.aes=list(size=5)))
+    
+        if(legend.position != "") p1 <- p1 + theme(legend.text=element_text(size=10), legend.position = legend.position)
+        if(legend.position == "") p1 <- p1 + theme(legend.text=element_text(size=10), legend.justification = c(1,1), legend.position = c(1,1)) 
+
     plot.new()
     p1
     ggsave(file.pdf, device = "pdf", dpi = 300)
