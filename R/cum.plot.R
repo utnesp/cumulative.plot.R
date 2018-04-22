@@ -26,7 +26,7 @@ cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.ge
     if (grepl(".txt", file.or.object) == TRUE) t <- read.delim(file.or.object, header = T)
     if ((class(file.or.object) == "matrix") == TRUE) t <- data.frame(file.or.object)
     
-    if (log.transform = T) t <- log2(t+prior.count)
+    if (log.transform == TRUE) t <- log2(t+prior.count)
     
     t$CPM <- rowMeans(t)
     t$ensembl_gene_id <- row.names(t)
