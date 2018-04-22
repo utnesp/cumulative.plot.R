@@ -18,12 +18,16 @@
 #' @import plotly
 #' @import htmlwidgets
 #' @import data.table
+#' @import splitstackshape
 #' @examples See https://github.com/utnesp/cumulative.plot.R
 
-cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.genes = F, cum.freq.out.file.txt = "", file.pdf = "", file.html = "", color.numbers.to.use = "", biotype.cutoff = "") {
+cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.genes = F, cum.freq.out.file.txt = "", file.pdf = "", file.html = "", color.numbers.to.use = "", biotype.cutoff = "", log.transform = F, prior.count = 0.25) {
 
     if (grepl(".txt", file.or.object) == TRUE) t <- read.delim(file.or.object, header = T)
     if ((class(file.or.object) == "matrix") == TRUE) t <- data.frame(file.or.object)
+    
+    if (log.transform = T) t <- log2(t+prior.count)
+    
     t$CPM <- rowMeans(t)
     t$ensembl_gene_id <- row.names(t)
     t <- t[grep("ENSG", t$ensembl_gene_id), ]
