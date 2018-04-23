@@ -10,25 +10,29 @@
 #' @param biotype.cutoff How many biotypes to represent in the plot. Defaults to 10.
 #' @export
 #' @import biomaRt
-#' @import dplyr
 #' @import RColorBrewer
 #' @import easybiomart
 #' @import ggplot2
 #' @import ggthemes
 #' @import plotly
 #' @import htmlwidgets
-#' @import data.table
 #' @import splitstackshape
 #' @examples See https://github.com/utnesp/cumulative.plot.R
 
-cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.genes = F, cum.freq.out.file.txt = "", file.pdf = "", file.html = "", color.numbers.to.use = "", biotype.cutoff = "", log.transform = F, prior.count = 0.25) {
+cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.genes = F, cum.freq.out.file.txt = "", file.pdf = "", file.html = "", color.numbers.to.use = "", biotype.cutoff = "", prior.count = 0.25, log.transform = F, create.html = T,  axis.text.size = 10, theme.text.size = 10, legend.text.size = 10, save.tiff = F) {
 
-    if (grepl(".txt", file.or.object) == TRUE) t <- read.delim(file.or.object, header = T)
-    if ((class(file.or.object) == "matrix") == TRUE) t <- data.frame(file.or.object)
+    if (grepl(".txt", file.or.object) == TRUE) {
+        t <- read.delim(file.or.object, header = T)
+    } else {
+        t <- data.frame(file.or.object)
+    }
+    #if ((class(file.or.object) == "matrix") == TRUE) t <- data.frame(file.or.object)
+    #if (grepl(".txt", file.or.object) == FALSE) 
     
-    if (log.transform == TRUE) t <- log2(t+prior.count)
     
-    t$CPM <- rowMeans(t)
+    if (log.transform == T) t <- log2(t+prior.count)
+    
+     t$CPM <- rowMeans(t)
     t$ensembl_gene_id <- row.names(t)
     t <- t[grep("ENSG", t$ensembl_gene_id), ]
     x <- ensg2ext_name_biotype(t$ensembl_gene_id)
@@ -130,17 +134,18 @@ cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.ge
     # p1 <- ggplot(e.sub, aes(CPM, CumulativeFrequency)) + scale_shape_identity(name = "Biotype") + geom_point(aes(color = factor(gene_biotype), shape = shape, text = paste("GENE: ", paste(external_gene_name, "(", ensembl_gene_id, ")", sep = ""), "LENGTH:", GeneLength)), size = 0.5) + theme_classic() + labs(x = "log2(CPM)", y = "Cumulative Frequency")
     # p1 <- ggplot(e.sub, aes(CPM, CumulativeFrequency)) + geom_point(aes(color = factor(gene_biotype), shape = factor(shape), text = paste("GENE: ", paste(external_gene_name, "(", ensembl_gene_id, ")", sep = ""), "LENGTH:", GeneLength)), size = 1) + theme_classic() + theme(legend.title = element_text(colour = "white")) + labs(x = "CPM") + guides(shape=FALSE) + labs(x = "log2(CPM)", y = "Cumulative Frequency")
     
-    p1 <- ggplot(e.sub, aes(CPM, CumulativeFrequency)) + geom_point(aes(shape = gene_biotype, color = gene_biotype, text = paste("GENE: ", paste(external_gene_name, "(", ensembl_gene_id, ")", sep = ""), "LENGTH:", GeneLength)), size = 1) + theme_classic() + labs(x = "log2(CPM)", y = "Cumulative Frequency", color='Biotype') +
+    p1 <- ggplot(e.sub, aes(CPM, CumulativeFrequency)) + geom_point(aes(shape = gene_biotype, color = gene_biotype, text = paste("GENE: ", paste(external_gene_name, "(", ensembl_gene_id, ")", sep = ""), "LENGTH:", GeneLength)), size = 1) + theme_classic() + labs(x = "log2(CPM)", y = "Cumulative Relative Frequency", color='Biotype') +
         scale_colour_manual(name = "Biotype",
                             labels = s$gene_biotype,
                             values = as.character(s$color))  +
         scale_shape_manual(name = "Biotype",
                            labels = s$gene_biotype,
                            values = s$shape) + 
-        guides(shape=guide_legend(override.aes=list(size=5)))
+        guides(shape=guide_legend(override.aes=list(size=5))) +
+        theme(text = element_text(size = theme.text.size), axis.text = element_text(size = axis.text.size))
     
-        if(legend.position != "") p1 <- p1 + theme(legend.text=element_text(size=10), legend.position = legend.position)
-        if(legend.position == "") p1 <- p1 + theme(legend.text=element_text(size=10), legend.justification = c(1,1), legend.position = c(1,1)) 
+        if(legend.position != "") p1 <- p1 + theme(legend.text=element_text(size=legend.text.size), legend.position = legend.position)
+        if(legend.position == "") p1 <- p1 + theme(legend.text=element_text(size=legend.text.size), legend.justification = c(1,1), legend.position = c(1,1)) 
     
     p2 <- ggplot(e.sub, aes(x = factor(1), fill = factor(gene_biotype))) + geom_bar(width = 1, show.legend = FALSE) + 
         scale_fill_manual(name = "Biotype",
@@ -149,14 +154,20 @@ cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.ge
     p2 <- p2 + coord_polar(theta = "y") + theme_classic() + labs(x="", y = "") + theme(axis.ticks = element_blank(), axis.line = element_blank(), axis.text = element_blank()) 
     
     print(p1)
-    ggsave(file.pdf, device = "pdf", dpi = 300)
+    ggsave(file.pdf, device = "pdf", width = 178, height = 163, units = "mm")
+    
+    if(save.tiff == T) ggsave(gsub(".pdf", ".tiff", file.pdf), device = "tiff", width = 178, height = 163, units = "mm")
     print(p2)
-    ggsave(paste(gsub(".pdf", "", file.pdf), "_proportions.pdf", sep = ""), device = "pdf", dpi = 300)
+    proportions.file = paste(gsub(".pdf", "", file.pdf), "_proportions.pdf", sep = "")
+    ggsave(proportions.file, device = "pdf", width = 15, height = 15, units = "cm")
+    if(save.tiff == T) ggsave(gsub(".pdf", ".tiff", proportions.file), device = "tiff", width = 5, height = 5, units = "cm")
     openPDF(file.pdf)
     system(paste("open", dirname(file.pdf)))
     
-    p1 <- ggplotly(p1)
-    if (file.html == "") file.html <- paste(getwd(), "/CPM.cumfreq.html", sep = "")
-    htmlwidgets::saveWidget(p1, file.html, selfcontained = T, libdir = NULL)
-    system(paste("open", file.html))
+    if (create.html == T) {
+        p1 <- ggplotly(p1 + theme(text = element_text(size = 10), axis.text = element_text(size = 10), legend.text = element_text(size = 10)))
+        if (file.html == "") file.html <- paste(getwd(), "/CPM.cumfreq.html", sep = "")
+        htmlwidgets::saveWidget(p1, file.html, selfcontained = T, libdir = NULL)
+        system(paste("open", file.html))
+    }
 }
