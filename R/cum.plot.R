@@ -126,7 +126,7 @@ cum.plot <- function(file.or.object, legend.position = c(0.8, 0.7), incl.mito.ge
     # head(e.sub[grep("protein_coding", e.sub$gene_biotype), ])
     
     if (cum.freq.out.file.txt != "") {
-        write.delim(e.sub, cum.freq.out.file.txt)
+        write.table(e.sub, cum.freq.out.file.txt, sep = "\t", quote = F, row.names = F)
     }
     
     if (file.pdf == "") file.pdf <- paste(getwd(), "/CPM.cumfreq.pdf", sep = "")
